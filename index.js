@@ -5,8 +5,10 @@ app.get('/', function (req, res){
   res.send('Hello, world!')
 })
 
-app.get('/oi', function (req, res){
-  res.send('Olá, mundo')
+const listen = ['Rick Sanchez','Morty Smith','Summer Smith']
+
+app.get('/item',function(req,res){
+  res.send(listen)
 })
 
 app.listen(3000)
