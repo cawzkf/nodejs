@@ -36,4 +36,14 @@ app.get('/item/:id',function (req, res){
   res.send(item)
 })
 
+app.put('/item/:id', function (req, res){
+  const id = req.params.id
+
+  const novoItem = req.body.nome
+
+  listen[id-1] = novoItem
+
+  res.send('Item atualizado com sucesso: ' +id)
+})
+
 app.listen(3000)
