@@ -28,4 +28,12 @@ app.post('/item', function ( req, res ){
   res.send('Item criado :)')
 })
 
+app.get('/item/:id',function (req, res){
+  const id = req.params.id
+  
+  const item = listen [id-1]
+
+  res.send(item)
+})
+
 app.listen(3000)
