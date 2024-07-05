@@ -1,49 +1,114 @@
-const express = require ('express')
-const app = express()
+const express = require('express');
+const { MongoClient, ObjectId } = require('mongodb');
+const app = express();
+const port = 3000;
+const dbUrl = 'mongodb+srv://admin:7sZzutY65Mg3zkQq@cluster0.ns4sxry.mongodb.net';
+const dbName = 'ocean-jornada-backend';
+const client = new MongoClient(dbUrl);
 
-// Printa na tela uma msg
-app.get('/', function (req, res){
-  res.send('Hello, world!')
-})
+async function main() {
+  try {
+    console.log('Conectando ao banco de dados...');
+    await client.connect();
+    console.log('Banco de dados conectado com sucesso!');
 
-// Cria uma array de itens
-const listen = ['Rick Sanchez','Morty Smith','Summer Smith']
+    const db = client.db(dbName);
+    const collection = db.collection('item');
 
-//Read all - [GET] item
-app.get('/item', function ( req, res ){
-  res.send(listen)
-})
+    // Exemplo de rota inicial
+    app.get('/', function (req, res) {
+      res.send('; )');
+    });
 
-// Sinalizar json -- bory para o express
-app.use(express.json())
+    // Desafio: criar endpoint /oi que exibe "Olá, mundo!"
+    app.get('/oi', function (req, res) {
+      res.send('Olá, mundo!');
+    });
 
-//Create - [POST] item
-app.post('/item', function ( req, res ){
-  const item = req.body.nome
+    // Read All - [GET] /item
+    app.get('/item', async function (req, res) {
+      try {
+        const documentos = await collection.find().toArray();
+        res.json(documentos);
+      } catch (err) {
+        console.error('Erro ao buscar itens:', err);
+        res.status(500).json({ message: 'Erro ao buscar itens' });
+      }
+    });
 
-//Insere o item no final
-  listen.push(item)
+    app.use(express.json());
 
-//Mensagem de conclusão
-  res.send('Item criado :)')
-})
+    // Create - [POST] /item
+    app.post('/item', async function (req, res) {
+      try {
+        const item = req.body;
+        const result = await collection.insertOne(item);
+        res.json(result.ops[0]);
+      } catch (err) {
+        console.error('Erro ao criar item:', err);
+        res.status(500).json({ message: 'Erro ao criar item' });
+      }
+    });
 
-app.get('/item/:id',function (req, res){
-  const id = req.params.id
-  
-  const item = listen [id-1]
+    // Read By Id - [GET] /item/:id
+    app.get('/item/:id', async function (req, res) {
+      try {
+        const id = req.params.id;
+        const item = await collection.findOne({ _id: ObjectId(id) });
+        if (!item) {
+          res.status(404).json({ message: 'Item não encontrado' });
+          return;
+        }
+        res.json(item);
+      } catch (err) {
+        console.error('Erro ao buscar item por ID:', err);
+        res.status(500).json({ message: 'Erro ao buscar item por ID' });
+      }
+    });
 
-  res.send(item)
-})
+    // Update - [PUT] /item/:id
+    app.put('/item/:id', async function (req, res) {
+      try {
+        const id = req.params.id;
+        const novoNome = req.body.nome;
+        const result = await collection.updateOne(
+          { _id: ObjectId(id) },
+          { $set: { nome: novoNome } }
+        );
+        if (result.modifiedCount === 0) {
+          res.status(404).json({ message: 'Item não encontrado para atualização' });
+          return;
+        }
+        res.json({ message: 'Item atualizado com sucesso' });
+      } catch (err) {
+        console.error('Erro ao atualizar item:', err);
+        res.status(500).json({ message: 'Erro ao atualizar item' });
+      }
+    });
 
-app.put('/item/:id', function (req, res){
-  const id = req.params.id
+    // Delete - [DELETE] /item/:id
+    app.delete('/item/:id', async function (req, res) {
+      try {
+        const id = req.params.id;
+        const result = await collection.deleteOne({ _id: ObjectId(id) });
+        if (result.deletedCount === 0) {
+          res.status(404).json({ message: 'Item não encontrado para exclusão' });
+          return;
+        }
+        res.json({ message: 'Item excluído com sucesso' });
+      } catch (err) {
+        console.error('Erro ao excluir item:', err);
+        res.status(500).json({ message: 'Erro ao excluir item' });
+      }
+    });
 
-  const novoItem = req.body.nome
+    app.listen(port, () => {
+      console.log(`Servidor rodando em http://localhost:${port}`);
+    });
 
-  listen[id-1] = novoItem
+  } catch (err) {
+    console.error('Erro ao conectar ao banco de dados:', err);
+  }
+}
 
-  res.send('Item atualizado com sucesso: ' +id)
-})
-
-app.listen(3000)
+main();
