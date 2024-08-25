@@ -2,14 +2,6 @@
 
 Este é um projeto de exemplo que utiliza Express.js e MongoDB para criar uma API RESTful. O projeto inclui operações CRUD (Criar, Ler, Atualizar e Excluir) para gerenciar itens em uma coleção MongoDB.
 
-## Sumário
-
-- [Instalação]
-- [Uso]
-- [Endpoints]
-- [Contribuição]
-- [Licença]
-
 ## Instalação
 - npm install
 - npm start
