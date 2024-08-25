@@ -6,12 +6,12 @@ Este é um projeto de exemplo que utiliza Express.js e MongoDB para criar uma AP
 - npm install
 - npm start
   
-### Pré-requisitos
+## Pré-requisitos
 
 - [Node.js](https://nodejs.org/) (v14 ou superior)
 - [MongoDB](https://www.mongodb.com/) (deve estar em execução)
 
-### Passos para Instalação
+## Passos para Instalação
 
 1. Clone o repositório:
 
